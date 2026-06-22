@@ -30,9 +30,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-OLLAMA_API_URL = "http://localhost:11434/api/chat"
-OLLAMA_TAGS_URL = "http://localhost:11434/api/tags"
-
+OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/chat") 
+OLLAMA_TAGS_URL = os.getenv("OLLAMA_TAGS_URL", "http://localhost:11434/api/tags")
 REDIS_URL = f"redis://{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}"
 
 # Admin credentials from .env
