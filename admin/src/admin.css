@@ -1,0 +1,110 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a24;
+  --surface2: #232333;
+  --border: #2e2e45;
+  --accent: #7c6af7;
+  --accent-soft: rgba(124,106,247,0.12);
+  --text: #e8e8f0;
+  --text-muted: #888899;
+  --green: #7ecb8f;
+  --red: #e05b5b;
+  --radius: 10px;
+}
+
+html, body, #root { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 14px; }
+
+/* ── Login ── */
+.login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+.login-card {
+  width: 360px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px 32px; display: flex; flex-direction: column; gap: 14px;
+}
+.login-logo { font-size: 40px; text-align: center; }
+.login-title { font-size: 22px; font-weight: 700; text-align: center; }
+.login-sub { font-size: 13px; color: var(--text-muted); text-align: center; }
+.login-error { background: rgba(224,91,91,0.12); border: 1px solid var(--red); border-radius: var(--radius); padding: 10px 14px; color: var(--red); font-size: 13px; }
+.login-input {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); padding: 10px 14px; font-size: 14px; outline: none; width: 100%;
+  transition: border-color 0.15s;
+}
+.login-input:focus { border-color: var(--accent); }
+.login-btn {
+  background: var(--accent); border: none; border-radius: var(--radius);
+  color: #fff; padding: 12px; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s; margin-top: 4px;
+}
+.login-btn:hover:not(:disabled) { background: #6a58e0; }
+.login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Dashboard layout ── */
+.dashboard { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Sidebar ── */
+.sidebar { width: 320px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+
+.sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; font-size: 20px; }
+.sidebar-logo h2 { font-size: 15px; font-weight: 700; }
+.total-badge { font-size: 11px; color: var(--text-muted); background: var(--surface2); border-radius: 20px; padding: 2px 8px; }
+.logout-btn { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); padding: 6px 10px; cursor: pointer; font-size: 12px; transition: all 0.15s; white-space: nowrap; }
+.logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+.search-wrap { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.search-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 12px; font-size: 13px; outline: none; }
+.search-input:focus { border-color: var(--accent); }
+
+.sidebar-loading { display: flex; align-items: center; gap: 10px; padding: 20px 16px; color: var(--text-muted); font-size: 13px; }
+.no-users { padding: 24px 16px; color: var(--text-muted); font-size: 13px; text-align: center; }
+
+/* ── User list ── */
+.user-list { flex: 1; overflow-y: auto; list-style: none; }
+.user-list::-webkit-scrollbar { width: 4px; }
+.user-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+.user-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.12s; }
+.user-item:hover { background: var(--surface2); }
+.user-item.active { background: var(--accent-soft); border-left: 3px solid var(--accent); }
+
+.user-avatar { font-size: 24px; flex-shrink: 0; }
+.user-info { flex: 1; min-width: 0; }
+.user-id-text { font-size: 12px; font-family: monospace; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-meta-row { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 5px; align-items: center; }
+.dot-sep { color: var(--border); }
+.user-time { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+
+/* ── Chat panel ── */
+.chat-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+
+.empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--text-muted); }
+.empty-icon { font-size: 48px; }
+
+/* ── ChatView ── */
+.chat-view { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+.chat-view-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px; flex-shrink: 0; }
+.cv-info { display: flex; align-items: flex-start; gap: 14px; }
+.cv-avatar { font-size: 36px; }
+.cv-uid { font-size: 13px; font-family: monospace; font-weight: 600; margin-bottom: 4px; }
+.cv-meta-row { font-size: 12px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; margin-top: 2px; flex-wrap: wrap; }
+
+.cv-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.cv-messages::-webkit-scrollbar { width: 4px; }
+.cv-messages::-webkit-scrollbar-thumb { background: var(--border); }
+
+.no-msgs { color: var(--text-muted); text-align: center; margin-top: 40px; }
+
+.cv-msg { display: flex; flex-direction: column; gap: 4px; max-width: 75%; }
+.cv-user { align-self: flex-end; align-items: flex-end; }
+.cv-bot { align-self: flex-start; }
+.cv-role { font-size: 11px; color: var(--text-muted); padding: 0 4px; }
+.cv-bubble { padding: 10px 14px; border-radius: 14px; font-size: 13.5px; line-height: 1.6; word-break: break-word; }
+.cv-user .cv-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+.cv-bot .cv-bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+
+/* ── Spinner ── */
+.spin { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
