@@ -118,7 +118,7 @@ cmds:
 	@echo "  make freetalk-react-build - to build the freetalk-react app"
 	@echo "  make freetalk-react-clean - to clear the freetalk-react app node_modules"
 	@echo "  make freetalk-admin-react-build - to build the freetalk-admin-react app"
-	@echo "  make freetalk-admin-react-clean - to clear the freetalk
+	@echo "  make freetalk-admin-react-clean - to clear the freetalk"
 	@echo "  make docker-compose-restart - to restart the docker compose"
 	@echo "  make docker-compose-build - to build the docker compose"
 	@echo "  make docker-compose-up - to start the docker compose"
