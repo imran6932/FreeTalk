@@ -18,8 +18,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy rest of the code
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p uploads vector_stores
 
 # Expose port
 EXPOSE 8002
