@@ -59,28 +59,34 @@ versions:
 
 
 docker-install:
-	@docker --version || ( \
-		sudo apt-get update; \
-		sudo apt-get install -y ca-certificates curl; \
-		sudo install -m 0755 -d /etc/apt/keyrings; \
-		sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc; \
-		sudo chmod a+r /etc/apt/keyrings/docker.asc; \
-		echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $$(. /etc/os-release && echo "$$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null; \
-		echo "Docker installed successfully\n"; \
-	)
+	@if docker --version >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then \
+		echo "`docker --version`"; \
+		echo "`docker compose version`"; \
+		echo "Docker already installed"; \
+	else \
+		sudo apt-get update && \
+		sudo apt-get install -y ca-certificates curl && \
+		sudo install -m 0755 -d /etc/apt/keyrings && \
+		sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && \
+		sudo chmod a+r /etc/apt/keyrings/docker.asc && \
+		echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $$([ -f /etc/os-release ] && . /etc/os-release && echo $$VERSION_CODENAME) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+		sudo apt-get update && \
+		sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
+		echo "Docker installed successfully"; \
+		echo "`docker --version`"; \
+		echo "`docker compose version`";	\
+	fi
 
-docker-compose-install: 
-	@docker-compose version || ( \
-		sudo apt-get update && sudo apt-get install -y; \
-		sudo apt install -y curl jq; \
-		sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$$(uname -s)-$$(uname -m)" -o /usr/local/bin/docker-compose; \
-		sudo chmod +x /usr/local/bin/docker-compose; \
-		echo "docker-compose version- $$(docker-compose --version)"; \
-		echo "docker-compose installed successfully"; \
+nginx-install:
+	@nginx -v >/dev/null 2>&1 && certbot --version >/dev/null 2>&1 && echo "Nginx and Certbot already installed" || ( \
+		sudo apt-get update && \
+		sudo apt-get install -y nginx certbot python3-certbot-nginx && \
+		sudo systemctl enable nginx && \
+		sudo systemctl start nginx && \
+		echo "Nginx and Certbot installed successfully"; \
+		nginx -v; \
+		certbot --version; \
 	)
-
-install: docker-install docker-compose-install
-	@echo "Docker and docker-compose Installation completed\n"
 
 
 docker-compose-build:
@@ -115,6 +121,8 @@ docker-compose-restart: install-frontend-requirements freetalk-react-build freet
 
 cmds:
 	@echo "Available commands:"
+	@echo " make docker-install - to install Docker and Docker Compose"
+	@echo "  make nginx-install - to install Nginx and Certbot"
 	@echo "  make freetalk-react-build - to build the freetalk-react app"
 	@echo "  make freetalk-react-clean - to clear the freetalk-react app node_modules"
 	@echo "  make freetalk-admin-react-build - to build the freetalk-admin-react app"

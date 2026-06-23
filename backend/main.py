@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import  Optional
 import json
 import httpx
 import redis.asyncio as aioredis
@@ -379,6 +379,28 @@ async def admin_user_history(user_id: str, _: str = Depends(verify_admin)):
         "gender": gender or "unknown",
         "messages": history,
         "count": len(history),
+    }
+
+
+@app.delete("/admin/users/{user_id}")
+async def admin_delete_user(
+    user_id: str,
+    _: str = Depends(verify_admin)
+):
+    """Delete user and all associated data."""
+
+    keys = [
+        key_history(user_id),
+        key_gender(user_id),
+        key_meta(user_id),
+    ]
+
+    await redis_client.delete(*keys)
+
+    return {
+        "success": True,
+        "message": "User deleted successfully",
+        "user_id": user_id,
     }
 
 

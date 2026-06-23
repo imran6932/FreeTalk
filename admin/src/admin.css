@@ -108,3 +108,23 @@ html, body, #root { height: 100%; background: var(--bg); color: var(--text); fon
 /* ── Spinner ── */
 .spin { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+
+.user-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.delete-user-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.delete-user-btn:hover {
+  opacity: 1;
+}
