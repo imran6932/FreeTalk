@@ -3,3 +3,5 @@ node_modules
 *.cjs
 *.mjs
 *.lock
+*.yarn
+*.gz
