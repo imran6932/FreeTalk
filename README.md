@@ -4,6 +4,11 @@ A full-stack conversational AI application built with **React**, **FastAPI**, **
 
 ---
 
+## 🚀 Live Demo
+
+- **Frontend**: [freetalk.imranansari.in](https://freetalk.imranansari.in)
+- **API Docs**: [api.freetalk.imranansari.in/docs](https://api.freetalk.imranansari.in/docs)
+
 ## 🎯 Features
 
 ### User App (Frontend)
