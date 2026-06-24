@@ -1,16 +1,17 @@
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from pydantic import BaseModel
-from typing import  Optional
+import os
 import json
 import httpx
-import redis.asyncio as aioredis
-import os
 import secrets
-from datetime import datetime, timezone
 import dotenv
+from typing import Optional
+import redis.asyncio as aioredis
+from pydantic import BaseModel
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 dotenv.load_dotenv()
 
@@ -24,7 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/chat") 
+OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/chat")
 OLLAMA_TAGS_URL = os.getenv("OLLAMA_TAGS_URL", "http://localhost:11434/api/tags")
 REDIS_URL = f"redis://{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}"
 
@@ -92,15 +93,46 @@ Rules:
 redis_client: aioredis.Redis = None
 
 
-@app.on_event("startup")
-async def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
     global redis_client
-    redis_client = aioredis.from_url(REDIS_URL, decode_responses=True)
+
+    # Connect Redis
+    redis_client = aioredis.from_url(
+        REDIS_URL,
+        decode_responses=True,
+    )
+
+    # Warmup Ollama
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                OLLAMA_API_URL,
+                json={
+                    "model": "llama3.1:8b",
+                    "messages": [{"role": "user", "content": "hi"}],
+                    "stream": False,
+                    "keep_alive": -1,
+                },
+            )
+
+        print("Ollama model warmed up")
+
+    except Exception as e:
+        print("Warmup failed:", e)
+
+    yield
+
+    # Shutdown
+    if redis_client:
+        await redis_client.aclose()
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    await redis_client.aclose()
+app = FastAPI(
+    title="FreeTalk API",
+    lifespan=lifespan,
+)
 
 
 # ── Redis key helpers ─────────────────────────────────────────────────────────
@@ -269,7 +301,7 @@ async def chat(user_id: str, request: ChatRequest):
     history.append({"role": "user", "content": request.message})
 
     gender = await get_user_gender(user_id)
-    
+
     if not gender:
         gender = extract_gender(history)
     if gender:
@@ -383,10 +415,7 @@ async def admin_user_history(user_id: str, _: str = Depends(verify_admin)):
 
 
 @app.delete("/admin/users/{user_id}")
-async def admin_delete_user(
-    user_id: str,
-    _: str = Depends(verify_admin)
-):
+async def admin_delete_user(user_id: str, _: str = Depends(verify_admin)):
     """Delete user and all associated data."""
 
     keys = [
