@@ -15,13 +15,13 @@ export default function WelcomeScreen({ onSuggest }) {
       <p className="welcome-sub">
         Ek dost jaise baat karo — Hindi, English, ya Hinglish. Apna naam batao aur shuru karte hain! 😄
       </p>
-      <div className="suggestions">
+      {/* <div className="suggestions">
         {SUGGESTIONS.map((s, i) => (
           <button key={i} className="chip" onClick={() => onSuggest(s)}>
             {s}
           </button>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }
