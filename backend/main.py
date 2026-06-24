@@ -15,7 +15,47 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 dotenv.load_dotenv()
 
-app = FastAPI(title="FreeTalk Chatbot API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    global redis_client
+
+    # Connect Redis
+    redis_client = aioredis.from_url(
+        REDIS_URL,
+        decode_responses=True,
+    )
+
+    # Warmup Ollama
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                OLLAMA_API_URL,
+                json={
+                    "model": "llama3.1:8b",
+                    "messages": [{"role": "user", "content": "hi"}],
+                    "stream": False,
+                    "keep_alive": -1,
+                },
+            )
+
+        print("Ollama model warmed up")
+
+    except Exception as e:
+        print("Warmup failed:", e)
+
+    yield
+
+    # Shutdown
+    if redis_client:
+        await redis_client.aclose()
+
+
+app = FastAPI(
+    title="FreeTalk API",
+    lifespan=lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -91,48 +131,6 @@ Rules:
 # ── Redis ─────────────────────────────────────────────────────────────────────
 
 redis_client: aioredis.Redis = None
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-
-    global redis_client
-
-    # Connect Redis
-    redis_client = aioredis.from_url(
-        REDIS_URL,
-        decode_responses=True,
-    )
-
-    # Warmup Ollama
-    try:
-        async with httpx.AsyncClient() as client:
-            await client.post(
-                OLLAMA_API_URL,
-                json={
-                    "model": "llama3.1:8b",
-                    "messages": [{"role": "user", "content": "hi"}],
-                    "stream": False,
-                    "keep_alive": -1,
-                },
-            )
-
-        print("Ollama model warmed up")
-
-    except Exception as e:
-        print("Warmup failed:", e)
-
-    yield
-
-    # Shutdown
-    if redis_client:
-        await redis_client.aclose()
-
-
-app = FastAPI(
-    title="FreeTalk API",
-    lifespan=lifespan,
-)
 
 
 # ── Redis key helpers ─────────────────────────────────────────────────────────
